@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colorful Drawing App</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        #drawingContainer {
+            position: relative;
+        }
+
+        canvas {
+            background-color: #fff;
+            touch-action: none; /* Disable touch gestures to allow drawing */
+            border: 2px solid #333; /* Dark border for canvas outlines */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Soft shadow for canvas */
+        }
+
+        button {
+            position: absolute;
+            top: calc(100% + 20px);
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50; /* Green background color */
+            color: #fff; /* White text color */
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+    </style>
+</head>
+<body>
+    <div id="drawingContainer">
+        <canvas id="drawingCanvas"></canvas>
+        <button id="resetButton">Reset</button>
+    </div>
+
+    <script>
+        // Function to initialize the drawing app
+        function initializeDrawingApp() {
+            const canvas = document.getElementById('drawingCanvas');
+            const context = canvas.getContext('2d');
+
+            // Set fixed dimensions for the canvas
+            const canvasWidth = 800;
+            const canvasHeight = 800;
+
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+
+            let drawing = false;
+
+            // Event listeners for touch and mouse events
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mousemove', draw);
+
+            canvas.addEventListener('touchstart', (e) => {
+                startDrawing(e.touches[0]);
+            });
+
+            canvas.addEventListener('touchend', stopDrawing);
+
+            canvas.addEventListener('touchmove', (e) => {
+                draw(e.touches[0]);
+                e.preventDefault(); // Prevent default touch actions like scrolling
+            });
+
+            // Reset button functionality
+            const resetButton = document.getElementById('resetButton');
+            resetButton.addEventListener('click', resetCanvas);
+
+            // Resize canvas when the window is resized (optional)
+            window.addEventListener('resize', resizeCanvas);
+
+            // Function to start drawing
+            function startDrawing(e) {
+                drawing = true;
+                draw(e);
+            }
+
+            // Function to stop drawing
+            function stopDrawing() {
+                drawing = false;
+                context.beginPath(); // Reset path after stopping drawing
+            }
+
+            // Function to handle drawing
+            function draw(e) {
+                if (!drawing) return;
+
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX || e.touches[0].clientX) - rect.left;
+                const y = (e.clientY || e.touches[0].clientY) - rect.top;
+
+                context.lineWidth = 5;
+                context.lineCap = 'round';
+                context.strokeStyle = '#000'; // Black ink
+
+                context.lineTo(x, y);
+                context.stroke();
+
+                context.beginPath();
+                context.moveTo(x, y);
+            }
+
+            // Function to reset the canvas
+            function resetCanvas() {
+                context.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+            }
+
+            // Function to resize the canvas
+            function resizeCanvas() {
+                // You may choose to handle resizing differently based on your needs
+                // For simplicity, this example does not handle resizing for fixed dimensions
+            }
+        }
+
+        // Initialize the drawing app when the page loads
+        document.addEventListener('DOMContentLoaded', initializeDrawingApp);
+    </script>
+</body>
+</html>
